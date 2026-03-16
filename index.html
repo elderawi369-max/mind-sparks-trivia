@@ -21,6 +21,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
 
+  <!-- Config (API keys) – loaded first so other scripts can use CONFIG -->
+  <script src="scripts/config.js"></script>
+
   <!-- App Styles -->
   <link rel="stylesheet" href="styles/main.css" />
 </head>
@@ -111,17 +114,12 @@
 
   </div><!-- /#app -->
 
-    <!-- Firebase service layer (init + TriviaApp global) -->
+    <!-- App scripts (CONFIG is loaded in <head> via scripts/config.js, so it is available here) -->
     <script src="scripts/firebase.js"></script>
-    <!-- Local (untracked) config with API keys: defines window.* variables -->
-    <script src="config.js"></script>
-    <!-- AI question generation service -->
     <script src="scripts/ai.js"></script>
-    <!-- Image fetching service (Unsplash + localStorage cache) -->
     <script src="scripts/utils/images.js"></script>
-    <!-- i18n service (non‑module so it works over file://) -->
+    <script src="scripts/leaderboard.js"></script>
     <script src="scripts/utils/i18n.js"></script>
-    <!-- App UI / routing -->
     <script src="scripts/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {

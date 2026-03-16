@@ -1,30 +1,33 @@
+// Firebase config loaded from global CONFIG (set in config.js)
+
 /**
  * Mind Sparks Trivia – Firebase Service Layer
  *
  * Exposes a single global `TriviaApp` object consumed by every
  * other script.  Must be loaded AFTER the Firebase compat CDN
- * scripts and BEFORE app.js / game modules.
+ * scripts and config.js, and BEFORE app.js / game modules.
  *
  * Load order in index.html:
  *   1. firebase-app-compat.js
  *   2. firebase-auth-compat.js
  *   3. firebase-firestore-compat.js
- *   4. scripts/firebase.js   ← this file
- *   5. scripts/app.js
+ *   4. scripts/config.js
+ *   5. scripts/firebase.js   ← this file
+ *   6. scripts/app.js
  */
 
 /* ── 1. CONFIGURATION ──────────────────────────────────────── */
-const _firebaseConfig = {
-  apiKey:            "AIzaSyDLYRxaSFEjjFTSXqbsS-WXAXqOSi86y9M",
-  authDomain:        "mind-sparks-trivia.firebaseapp.com",
-  projectId:         "mind-sparks-trivia",
-  storageBucket:     "mind-sparks-trivia.firebasestorage.app",
-  messagingSenderId: "162705395945",
-  appId:             "1:162705395945:web:de1673929165de2894e078",
+const firebaseConfig = {
+  apiKey:            CONFIG.FIREBASE_API_KEY,
+  authDomain:        CONFIG.FIREBASE_AUTH_DOMAIN,
+  projectId:         CONFIG.FIREBASE_PROJECT_ID,
+  storageBucket:     CONFIG.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: CONFIG.FIREBASE_MESSAGING_SENDER_ID,
+  appId:             CONFIG.FIREBASE_APP_ID,
 };
 
 /* ── 2. SDK INITIALISATION ─────────────────────────────────── */
-firebase.initializeApp(_firebaseConfig);
+firebase.initializeApp(firebaseConfig);
 
 const _auth = firebase.auth();
 const _db   = firebase.firestore();

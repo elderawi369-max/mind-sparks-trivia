@@ -11,16 +11,17 @@
  *   3. Picsum placeholder  – deterministic seed, never throws
  *
  * Load order in index.html:
- *   firebase.js → ai.js → images.js → app.js → [mode scripts loaded lazily]
+ *   config.js → firebase.js → ai.js → images.js → app.js → [mode scripts loaded lazily]
  *
  * ⚠️  SECURITY  ─────────────────────────────────────────────────────────
- * The Access Key below is visible to anyone who opens DevTools.
- * In your Unsplash app settings, set "Allowed Referrer Domains" to your
- * production domain so the key cannot be used on other sites.
+ * The Access Key is loaded from global CONFIG (config.js). In your Unsplash
+ * app settings, set "Allowed Referrer Domains" to your production domain.
  * For production deployments, proxy image requests through a server-side
- * function and remove the key from this file entirely.
+ * function and do not expose the key in client code.
  * ────────────────────────────────────────────────────────────────────────
  */
+
+// Unsplash key loaded from global CONFIG (set in config.js)
 
 (function attachImages() {
   'use strict';
@@ -29,11 +30,11 @@
      1. CONFIGURATION
      ═══════════════════════════════════════════════════════════════ */
 
-  const CONFIG = {
-    // ⚠️  Keep out of version control. Restrict to your domain in the
-    //     Unsplash developer dashboard: https://unsplash.com/oauth/applications
-    accessKey:   'rne6-XWK9fsYb5kLBLTv5vIB2nGnjPZqZPw0ZOTBkaM',
+  const CONFIG = typeof window !== 'undefined' && window.CONFIG ? window.CONFIG : {};
+  const accessKey = (CONFIG.UNSPLASH_ACCESS_KEY || '').trim();
 
+  const IMAGE_CONFIG = {
+    accessKey,
     endpoint:    'https://api.unsplash.com/search/photos',
     timeoutMs:   5_000,
     resultsPool: 5,   // fetch top-N then pick one at random for variety
@@ -130,25 +131,25 @@
     }
 
     // ── 2. Unsplash Search API ───────────────────────────────────
-    if (!CONFIG.accessKey || CONFIG.accessKey === 'YOUR_UNSPLASH_ACCESS_KEY') {
+    if (!IMAGE_CONFIG.accessKey || IMAGE_CONFIG.accessKey === 'YOUR_UNSPLASH_ACCESS_KEY') {
       console.warn('[Images] Unsplash key not configured – using placeholder.');
       return _fallbackUrl(cleanTopic);
     }
 
     const controller = new AbortController();
-    const timer      = setTimeout(() => controller.abort(), CONFIG.timeoutMs);
+    const timer      = setTimeout(() => controller.abort(), IMAGE_CONFIG.timeoutMs);
 
     try {
       const params = new URLSearchParams({
         query:          cleanTopic,
-        per_page:       String(CONFIG.resultsPool),
+        per_page:       String(IMAGE_CONFIG.resultsPool),
         orientation:    'landscape',
         content_filter: 'high',
       });
 
-      const res = await fetch(`${CONFIG.endpoint}?${params}`, {
+      const res = await fetch(`${IMAGE_CONFIG.endpoint}?${params}`, {
         signal:  controller.signal,
-        headers: { Authorization: `Client-ID ${CONFIG.accessKey}` },
+        headers: { Authorization: `Client-ID ${IMAGE_CONFIG.accessKey}` },
       });
       clearTimeout(timer);
 

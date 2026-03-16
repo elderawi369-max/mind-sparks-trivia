@@ -10,7 +10,7 @@
  * Exposes its public API via  TriviaApp.AI
  *
  * Load order in index.html:
- *   firebase.js  →  ai.js  →  app.js  →  mode scripts
+ *   config.js  →  firebase.js  →  ai.js  →  app.js  →  mode scripts
  *
  * ⚠️  SECURITY WARNING ─────────────────────────────────────────
  * API keys stored in client-side JS are visible to anyone who
@@ -22,44 +22,15 @@
  * ──────────────────────────────────────────────────────────────
  */
 
+// API keys loaded from global CONFIG (set in config.js)
+
 (function attachAI() {
   'use strict';
 
-  /* ═══════════════════════════════════════════════════════════════
-     1. RUNTIME CONFIGURATION (API KEYS)
-     ═══════════════════════════════════════════════════════════════ */
-
-  /**
-   * CONFIG centralises how API keys are resolved at runtime.
-   *
-   * Priority for each key:
-   *   1. window.<NAME>       – e.g. set via a local config.js included before ai.js
-   *   2. process.env.<NAME>  – when bundled into a build step that injects env vars
-   *   3. ''                  – empty string → provider is skipped
-   *
-   * IMPORTANT:
-   * - Do NOT hardcode real keys in this file.
-   * - Restrict keys by domain / usage in each provider dashboard.
-   */
-  const CONFIG = (function () {
-    const w  = typeof window !== 'undefined' ? window : {};
-    const pe = typeof process !== 'undefined' && process.env ? process.env : {};
-
-    const from = (browserKey, envKey) => {
-      const v = (w[browserKey] || pe[envKey] || '').trim();
-      return typeof v === 'string' ? v : '';
-    };
-
-    return {
-      DEEPSEEK_API_KEY:       from('DEEPSEEK_API_KEY',       'DEEPSEEK_API_KEY'),
-      OPENAI_API_KEY:         from('OPENAI_API_KEY',         'OPENAI_API_KEY'),
-      OPENROUTER_API_KEY:     from('OPENROUTER_API_KEY',     'OPENROUTER_API_KEY'),
-      UNSPLASH_ACCESS_KEY:    from('UNSPLASH_ACCESS_KEY',    'UNSPLASH_ACCESS_KEY'),
-    };
-  })();
+  const CONFIG = typeof window !== 'undefined' && window.CONFIG ? window.CONFIG : {};
 
   /* ═══════════════════════════════════════════════════════════════
-     2. PROVIDER CONFIGURATION
+     1. PROVIDER CONFIGURATION
      ═══════════════════════════════════════════════════════════════ */
 
   /**
@@ -73,15 +44,15 @@
       name:       'DeepSeek',
       endpoint:   'https://api.deepseek.com/v1/chat/completions',
       model:      'deepseek-chat',
-      apiKey:     CONFIG.DEEPSEEK_API_KEY,
+      apiKey:     (CONFIG.DEEPSEEK_API_KEY || '').trim(),
       headers:    {},
       maxRetries: 1,   // fail fast – move to next provider immediately on first failure
     },
     {
       name:       'OpenRouter',
       endpoint:   'https://openrouter.ai/api/v1/chat/completions',
-      model:      'deepseek/deepseek-chat',
-      apiKey:     CONFIG.OPENROUTER_API_KEY,
+      model:      'openrouter/free',
+      apiKey:     (CONFIG.OPENROUTER_API_KEY || '').trim(),
       headers:    {
         'HTTP-Referer': 'https://mindsparkstrivia.com',
         'X-Title':      'Mind Sparks Trivia',
@@ -92,7 +63,7 @@
       name:       'OpenAI',
       endpoint:   'https://api.openai.com/v1/chat/completions',
       model:      'gpt-3.5-turbo',
-      apiKey:     CONFIG.OPENAI_API_KEY,
+      apiKey:     (CONFIG.OPENAI_API_KEY || '').trim(),
       headers:    {},
       // maxRetries omitted → falls back to MAX_RETRIES (2)
     },
@@ -984,13 +955,11 @@
     /**
      * Unsplash image API key for Guess the Year mode.
      * Free tier: 50 req/hour. Get one at https://unsplash.com/developers
-     *
-     * Resolved from CONFIG.UNSPLASH_ACCESS_KEY (window or process.env).
-     * This file never hardcodes the real key.
+     * Loaded from global CONFIG (config.js).
      */
     TriviaApp.config.unsplashKey =
       TriviaApp.config.unsplashKey ||
-      CONFIG.UNSPLASH_ACCESS_KEY ||
+      (CONFIG.UNSPLASH_ACCESS_KEY || '').trim() ||
       '';
 
     TriviaApp.AI = Object.freeze({
