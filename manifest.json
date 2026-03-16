@@ -1,0 +1,12 @@
+{
+  "name": "AI Trivia Challenge",
+  "short_name": "TriviaAI",
+  "description": "Fast, mobile-friendly trivia powered by AI – Beat the Streak, Guess the Year, and Quick Match.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0b1020",
+  "theme_color": "#1a1a2e"
+}
+

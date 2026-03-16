@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Mind Sparks Trivia – Beat the Streak, Guess the Year, and Quick Match game modes." />
+  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="TriviaAI" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Mind Sparks Trivia</title>
+
+  <!-- Manifest -->
+  <link rel="manifest" href="/manifest.json" />
+  <!-- Simple favicon to avoid 404s while developing -->
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' ry='12' fill='%231a1a2e'/%3E%3Ctext x='50%25' y='55%25' text-anchor='middle' font-size='36' fill='%23f9f9f9'%3E%F0%9F%92%A1%3C/text%3E%3C/svg%3E" />
+
+  <!-- Firebase SDK (compat) -->
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore-compat.js"></script>
+
+  <!-- App Styles -->
+  <link rel="stylesheet" href="styles/main.css" />
+</head>
+<body>
+
+  <!-- ===== App Shell ===== -->
+  <div id="app">
+
+    <!-- Header -->
+    <header id="main-header">
+      <div class="logo-area">
+        <h1 class="logo">
+          <span class="icon">🧠</span>
+          Mind Sparks
+          <span class="sub">Trivia</span>
+        </h1>
+
+        <div class="header-buttons">
+          <button id="btn-leaderboard" class="icon-btn" aria-label="Leaderboard">🏆</button>
+          <button id="btn-profile" class="icon-btn" aria-label="Player profile">👤</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ===== Home Screen ===== -->
+    <main id="screen-home" class="screen active">
+      <section class="home-hero">
+        <p class="tagline">How sharp is your mind?</p>
+      </section>
+
+      <section class="mode-grid" aria-label="Game modes">
+
+        <button class="mode-card" id="btn-beat-streak" data-mode="streak">
+          <span class="mode-icon">🔥</span>
+          <span class="mode-title">Beat the Streak</span>
+          <span class="mode-desc">Answer endlessly — keep your streak alive</span>
+          <span class="mode-badge">Lifelines available</span>
+        </button>
+
+        <button class="mode-card" id="btn-guess-year" data-mode="yearguess">
+          <span class="mode-icon">📅</span>
+          <span class="mode-title">Guess the Year</span>
+          <span class="mode-desc">Pick the year an event happened from 4 clues</span>
+          <span class="mode-badge">Historical images</span>
+        </button>
+
+        <button class="mode-card" id="btn-quick-match" data-mode="multiplayer">
+          <span class="mode-icon">⚔️</span>
+          <span class="mode-title">Quick Match</span>
+          <span class="mode-desc">Challenge a friend via a share link</span>
+          <span class="mode-badge">Multiplayer</span>
+        </button>
+
+      </section>
+    </main>
+
+    <!-- ===== Game Screen (injected dynamically) ===== -->
+    <main id="screen-game" class="screen" aria-live="polite">
+      <!-- Game UI is rendered here by app.js -->
+    </main>
+
+    <!-- ===== Profile Screen ===== -->
+    <main id="screen-profile" class="screen" aria-live="polite">
+      <!-- Built dynamically by app.js when profile icon is tapped -->
+    </main>
+
+    <!-- ===== Leaderboard Screen ===== -->
+    <main id="screen-leaderboard" class="screen" aria-live="polite">
+      <header class="screen-header">
+        <button id="btn-leaderboard-back" class="icon-btn" aria-label="Back">←</button>
+        <h2>Leaderboard</h2>
+      </header>
+      <div id="leaderboard-content" class="leaderboard-container">
+      </div>
+    </main>
+
+    <!-- ===== Loading Overlay ===== -->
+    <div id="loading-overlay" class="loading-overlay hidden" role="status" aria-label="Loading">
+      <div class="spinner-wrapper">
+        <div class="spinner"></div>
+        <p id="loading-message" class="loading-text">Generating question…</p>
+        <p id="loading-fact"    class="loading-fact"  aria-live="polite"></p>
+      </div>
+    </div>
+
+    <!-- ===== Toast Notification ===== -->
+    <div id="toast" class="toast hidden" role="alert" aria-live="assertive"></div>
+
+  </div><!-- /#app -->
+
+    <!-- Firebase service layer (init + TriviaApp global) -->
+    <script src="scripts/firebase.js"></script>
+    <!-- Local (untracked) config with API keys: defines window.* variables -->
+    <script src="config.js"></script>
+    <!-- AI question generation service -->
+    <script src="scripts/ai.js"></script>
+    <!-- Image fetching service (Unsplash + localStorage cache) -->
+    <script src="scripts/utils/images.js"></script>
+    <!-- i18n service (non‑module so it works over file://) -->
+    <script src="scripts/utils/i18n.js"></script>
+    <!-- App UI / routing -->
+    <script src="scripts/app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/service-worker.js')
+          .catch(function (err) {
+            console.warn('Service worker registration failed:', err);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

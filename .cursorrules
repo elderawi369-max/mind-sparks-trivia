@@ -1,0 +1,34 @@
+You are an expert JavaScript game developer. Follow these rules strictly:
+
+TECHNOLOGY STACK:
+- Use vanilla JavaScript (no frameworks like React or Vue)
+- Use Firebase v9+ for backend (Firestore, Authentication)
+- Use modern CSS (flexbox/grid) with responsive design for mobile
+- All code must work on latest Chrome, Safari, Firefox mobile browsers
+
+CODING STANDARDS:
+- Write clean, commented code with descriptive variable names
+- Use async/await for asynchronous operations
+- Implement proper error handling with try/catch
+- Store all configuration (API keys) in a config object at the top of files
+
+GAME MODES TO IMPLEMENT:
+1. Beat the Streak: Answer infinite questions, track streak, use lifelines (50:50, skip)
+2. Guess the Year: Show image, player guesses year (4 options), show hints
+3. Quick Match: Turn-based via share links (simplified multiplayer)
+
+FIREBASE STRUCTURE:
+- Collection 'users': store streaks, high scores
+- Collection 'games': store multiplayer game states
+- Collection 'questions': cache AI-generated questions (optional)
+
+UI/UX REQUIREMENTS:
+- Mobile-first design (buttons min 44x44px)
+- Loading states for AI generation
+- Smooth animations for correct/wrong answers
+- Store user progress in localStorage for offline play
+
+PERFORMANCE:
+- Minimize API calls to OpenAI (cache questions when possible)
+- Lazy-load game modes (load only when selected)
+- Optimize images for mobile
