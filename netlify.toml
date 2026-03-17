@@ -1,0 +1,9 @@
+# Netlify build: generate scripts/config.js from env vars, then publish the site.
+# Set these in Netlify: Site settings → Environment variables
+#   FIREBASE_API_KEY, FIREBASE_AUTH_DOMAIN, FIREBASE_PROJECT_ID,
+#   FIREBASE_STORAGE_BUCKET, FIREBASE_MESSAGING_SENDER_ID, FIREBASE_APP_ID,
+#   DEEPSEEK_API_KEY, OPENAI_API_KEY, OPENROUTER_API_KEY, UNSPLASH_ACCESS_KEY
+
+[build]
+  command = "bash scripts/generate-config.sh"
+  publish = "."
