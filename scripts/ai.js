@@ -44,21 +44,18 @@
    * Providers are tried left-to-right.  Set any key to '' to skip
    * that provider entirely (it will be filtered out at runtime).
    *
+   * Current order (most reliable first based on quotas):
+   *   1. OpenRouter – free Gemini router
+   *   2. OpenAI     – quota-limited backup
+   *   3. DeepSeek   – balance-limited backup
+   *
    * ⚠️  Do NOT commit real keys to version control.
    */
   const PROVIDERS = [
     {
-      name:       'DeepSeek',
-      endpoint:   'https://api.deepseek.com/v1/chat/completions',
-      model:      'deepseek-chat',
-      apiKey:     _env('DEEPSEEK_API_KEY'),
-      headers:    {},
-      maxRetries: 1,   // fail fast – move to next provider immediately on first failure
-    },
-    {
       name:       'OpenRouter',
       endpoint:   'https://openrouter.ai/api/v1/chat/completions',
-      model:      'openrouter/free',
+      model:      'google/gemini-2.0-flash-lite-preview-02-05:free',
       apiKey:     _env('OPENROUTER_API_KEY'),
       headers:    {
         'HTTP-Referer': 'https://mindsparkstrivia.com',
@@ -74,7 +71,24 @@
       headers:    {},
       // maxRetries omitted → falls back to MAX_RETRIES (2)
     },
+    {
+      name:       'DeepSeek',
+      endpoint:   'https://api.deepseek.com/v1/chat/completions',
+      model:      'deepseek-chat',
+      apiKey:     _env('DEEPSEEK_API_KEY'),
+      headers:    {},
+      maxRetries: 1,   // fail fast – move to next provider immediately on first failure
+    },
   ].filter(p => p.apiKey.trim() !== '');   // skip any provider with a blank key
+
+  // Providers that have been rate-limited / payment-required this session.
+  const _disabledProviders = new Set();
+
+  function _disableProvider(name, reason) {
+    if (_disabledProviders.has(name)) return;
+    _disabledProviders.add(name);
+    console.warn(`[AI] Disabling provider for this session: ${name} – ${reason}`);
+  }
 
   /* ═══════════════════════════════════════════════════════════════
      3. TUNING CONSTANTS
@@ -570,6 +584,12 @@
           const errBody = await res.json().catch(() => ({}));
           const msg     = errBody?.error?.message ?? `HTTP ${res.status}`;
 
+          // Payment required or rate-limited → disable for rest of the session
+          if (res.status === 402 || res.status === 429) {
+            _disableProvider(provider.name, `HTTP ${res.status}`);
+            throw Object.assign(new Error(msg), { fatal: true });
+          }
+
           // Auth or bad-request errors won't improve with retries
           if (res.status === 401 || res.status === 403 || res.status === 400) {
             throw Object.assign(new Error(msg), { fatal: true });
@@ -636,6 +656,10 @@
     const errors = [];
 
     for (const provider of PROVIDERS) {
+      if (_disabledProviders.has(provider.name)) {
+        console.info(`[AI] Skipping disabled provider: ${provider.name}`);
+        continue;
+      }
       try {
         console.info(`[AI] Trying provider: ${provider.name}`);
         const content = await tryProvider(provider, messages, opts);
