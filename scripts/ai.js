@@ -22,12 +22,19 @@
  * ──────────────────────────────────────────────────────────────
  */
 
-// API keys loaded from global CONFIG (set in config.js)
+// API keys: CONFIG (local config.js) first, then process.env / NETLIFY_CONFIG for Netlify
 
 (function attachAI() {
   'use strict';
 
-  const CONFIG = typeof window !== 'undefined' && window.CONFIG ? window.CONFIG : {};
+  // Resolve key: local CONFIG → process.env → window.NETLIFY_CONFIG (Netlify inject)
+  function _env(key) {
+    const c = typeof window !== 'undefined' && window.CONFIG ? window.CONFIG[key] : undefined;
+    const e = typeof process !== 'undefined' && process.env && process.env[key];
+    const n = typeof window !== 'undefined' && window.NETLIFY_CONFIG && window.NETLIFY_CONFIG[key];
+    const v = c ?? e ?? n ?? '';
+    return (typeof v === 'string' ? v : String(v || '')).trim();
+  }
 
   /* ═══════════════════════════════════════════════════════════════
      1. PROVIDER CONFIGURATION
@@ -44,7 +51,7 @@
       name:       'DeepSeek',
       endpoint:   'https://api.deepseek.com/v1/chat/completions',
       model:      'deepseek-chat',
-      apiKey:     (CONFIG.DEEPSEEK_API_KEY || '').trim(),
+      apiKey:     _env('DEEPSEEK_API_KEY'),
       headers:    {},
       maxRetries: 1,   // fail fast – move to next provider immediately on first failure
     },
@@ -52,7 +59,7 @@
       name:       'OpenRouter',
       endpoint:   'https://openrouter.ai/api/v1/chat/completions',
       model:      'openrouter/free',
-      apiKey:     (CONFIG.OPENROUTER_API_KEY || '').trim(),
+      apiKey:     _env('OPENROUTER_API_KEY'),
       headers:    {
         'HTTP-Referer': 'https://mindsparkstrivia.com',
         'X-Title':      'Mind Sparks Trivia',
@@ -63,7 +70,7 @@
       name:       'OpenAI',
       endpoint:   'https://api.openai.com/v1/chat/completions',
       model:      'gpt-3.5-turbo',
-      apiKey:     (CONFIG.OPENAI_API_KEY || '').trim(),
+      apiKey:     _env('OPENAI_API_KEY'),
       headers:    {},
       // maxRetries omitted → falls back to MAX_RETRIES (2)
     },
@@ -955,11 +962,11 @@
     /**
      * Unsplash image API key for Guess the Year mode.
      * Free tier: 50 req/hour. Get one at https://unsplash.com/developers
-     * Loaded from global CONFIG (config.js).
+     * Resolved via same order as providers: CONFIG → process.env → NETLIFY_CONFIG.
      */
     TriviaApp.config.unsplashKey =
       TriviaApp.config.unsplashKey ||
-      (CONFIG.UNSPLASH_ACCESS_KEY || '').trim() ||
+      _env('UNSPLASH_ACCESS_KEY') ||
       '';
 
     TriviaApp.AI = Object.freeze({

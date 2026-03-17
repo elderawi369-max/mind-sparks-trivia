@@ -21,17 +21,25 @@
  * ────────────────────────────────────────────────────────────────────────
  */
 
-// Unsplash key loaded from global CONFIG (set in config.js)
+// Unsplash key: CONFIG (local config.js) first, then process.env / NETLIFY_CONFIG for Netlify
 
 (function attachImages() {
   'use strict';
+
+  // Resolve key: local CONFIG → process.env → window.NETLIFY_CONFIG (Netlify inject)
+  function _env(key) {
+    const c = typeof window !== 'undefined' && window.CONFIG ? window.CONFIG[key] : undefined;
+    const e = typeof process !== 'undefined' && process.env && process.env[key];
+    const n = typeof window !== 'undefined' && window.NETLIFY_CONFIG && window.NETLIFY_CONFIG[key];
+    const v = c ?? e ?? n ?? '';
+    return (typeof v === 'string' ? v : String(v || '')).trim();
+  }
 
   /* ═══════════════════════════════════════════════════════════════
      1. CONFIGURATION
      ═══════════════════════════════════════════════════════════════ */
 
-  const CONFIG = typeof window !== 'undefined' && window.CONFIG ? window.CONFIG : {};
-  const accessKey = (CONFIG.UNSPLASH_ACCESS_KEY || '').trim();
+  const accessKey = _env('UNSPLASH_ACCESS_KEY');
 
   const IMAGE_CONFIG = {
     accessKey,

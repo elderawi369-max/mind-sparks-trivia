@@ -1,4 +1,4 @@
-// Firebase config loaded from global CONFIG (set in config.js)
+// Firebase config: CONFIG (local config.js) first, then process.env / NETLIFY_CONFIG for Netlify
 
 /**
  * Mind Sparks Trivia – Firebase Service Layer
@@ -17,13 +17,22 @@
  */
 
 /* ── 1. CONFIGURATION ──────────────────────────────────────── */
+// Resolve each key: local CONFIG (config.js) → process.env → window.NETLIFY_CONFIG (Netlify inject)
+function _env(key) {
+  const c = typeof window !== 'undefined' && window.CONFIG ? window.CONFIG[key] : undefined;
+  const e = typeof process !== 'undefined' && process.env && process.env[key];
+  const n = typeof window !== 'undefined' && window.NETLIFY_CONFIG && window.NETLIFY_CONFIG[key];
+  const v = c ?? e ?? n ?? '';
+  return typeof v === 'string' ? v : String(v || '');
+}
+
 const firebaseConfig = {
-  apiKey:            CONFIG.FIREBASE_API_KEY,
-  authDomain:        CONFIG.FIREBASE_AUTH_DOMAIN,
-  projectId:         CONFIG.FIREBASE_PROJECT_ID,
-  storageBucket:     CONFIG.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: CONFIG.FIREBASE_MESSAGING_SENDER_ID,
-  appId:             CONFIG.FIREBASE_APP_ID,
+  apiKey:            _env('FIREBASE_API_KEY'),
+  authDomain:        _env('FIREBASE_AUTH_DOMAIN'),
+  projectId:         _env('FIREBASE_PROJECT_ID'),
+  storageBucket:     _env('FIREBASE_STORAGE_BUCKET'),
+  messagingSenderId: _env('FIREBASE_MESSAGING_SENDER_ID'),
+  appId:             _env('FIREBASE_APP_ID'),
 };
 
 /* ── 2. SDK INITIALISATION ─────────────────────────────────── */
