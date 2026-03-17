@@ -688,8 +688,51 @@ function _bindProfileEvents(model) {
 }
 
 /* ─────────────────────────────────────────────────────────────
-   9. AUTH-READY HANDLER
+   9. AUTH-READY HANDLER & QUESTION PREWARM
    ───────────────────────────────────────────────────────────── */
+
+/**
+ * Generate a small batch of questions up front so the first rounds
+ * in each mode can be served instantly from the offline store.
+ */
+async function prewarmQuestionCache() {
+  const ai    = (TriviaApp.AI || TriviaApp.ai);
+  const store = TriviaApp.OfflineStore;
+
+  if (!ai?.generateQuestion || !store?.saveQuestions) return;
+
+  const combos = [
+    ['general', 'easy'],
+    ['general', 'medium'],
+    ['history', 'easy'],
+    ['history', 'medium'],
+    ['science', 'easy'],
+    ['science', 'medium'],
+  ];
+
+  const warmed = [];
+
+  for (const [category, difficulty] of combos) {
+    for (let i = 0; i < 2; i++) {
+      try {
+        const q = await ai.generateQuestion(category, difficulty);
+        warmed.push({ ...q, category, difficulty });
+      } catch (err) {
+        console.warn('[App] prewarmQuestionCache skipped question:', err.message);
+        break;
+      }
+    }
+  }
+
+  if (!warmed.length) return;
+
+  try {
+    await store.saveQuestions(warmed);
+    console.info(`[App] Prewarmed question cache with ${warmed.length} questions.`);
+  } catch (err) {
+    console.warn('[App] prewarmQuestionCache save failed:', err.message);
+  }
+}
 
 /**
  * Fired by firebase.js via a custom 'trivia:ready' event once
@@ -711,6 +754,11 @@ async function _onAuthReady({ detail }) {
   } catch (err) {
     console.warn('[App] Could not prefetch high scores:', err.message);
   }
+
+  // Warm up local question cache in the background for snappier first rounds
+  prewarmQuestionCache().catch(err => {
+    console.warn('[App] prewarmQuestionCache failed:', err.message);
+  });
 
   // Unlock mode cards (they may have been visually disabled while auth resolved)
   _dom.modeCards.forEach(card => card.removeAttribute('disabled'));

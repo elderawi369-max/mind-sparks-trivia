@@ -44,8 +44,8 @@
   const IMAGE_CONFIG = {
     accessKey,
     endpoint:    'https://api.unsplash.com/search/photos',
-    timeoutMs:   5_000,
-    resultsPool: 5,   // fetch top-N then pick one at random for variety
+    timeoutMs:   8_000, // increased from 5_000 to allow slower connections
+    resultsPool: 5,     // fetch top-N then pick one at random for variety
   };
 
   /* ═══════════════════════════════════════════════════════════════

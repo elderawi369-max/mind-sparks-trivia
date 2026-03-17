@@ -55,7 +55,7 @@
     {
       name:       'OpenRouter',
       endpoint:   'https://openrouter.ai/api/v1/chat/completions',
-      model:      'openrouter/free',
+      model:      'stepfun/step-3.5-flash:free',
       apiKey:     _env('OPENROUTER_API_KEY'),
       headers:    {
         'HTTP-Referer': 'https://mindsparkstrivia.com',
