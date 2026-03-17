@@ -55,7 +55,7 @@
     {
       name:       'OpenRouter',
       endpoint:   'https://openrouter.ai/api/v1/chat/completions',
-      model:      'google/gemini-2.0-flash-lite-preview-02-05:free',
+      model:      'openrouter/free',
       apiKey:     _env('OPENROUTER_API_KEY'),
       headers:    {
         'HTTP-Referer': 'https://mindsparkstrivia.com',
