@@ -7,3 +7,7 @@
 [build]
   command = "bash scripts/generate-config.sh"
   publish = "."
+
+  # Generated config contains env values for the client; exclude from secrets scan.
+  [build.environment]
+    SECRETS_SCAN_OMIT_PATHS = "scripts/config.js"
