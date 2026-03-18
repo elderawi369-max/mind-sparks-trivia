@@ -132,9 +132,14 @@
     <script src="scripts/utils/i18n.js"></script>
     <script src="scripts/app.js"></script>
   <script>
+    (function () {
+      const link = document.querySelector('link[rel="manifest"]');
+      console.log('Manifest link path: ', link ? link.href : 'NO MANIFEST LINK FOUND');
+    })();
+
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function () {
-        navigator.serviceWorker.register('/service-worker.js')
+        navigator.serviceWorker.register('/sw.js')
           .catch(function (err) {
             console.warn('Service worker registration failed:', err);
           });

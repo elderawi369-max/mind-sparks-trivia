@@ -1,12 +1,54 @@
 {
-  "name": "AI Trivia Challenge",
-  "short_name": "TriviaAI",
-  "description": "Fast, mobile-friendly trivia powered by AI – Beat the Streak, Guess the Year, and Quick Match.",
+  "id": "/",
+  "name": "Mind Sparks Trivia",
+  "short_name": "Mind Sparks",
+  "description": "A fun and challenging trivia game to spark your mind.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "background_color": "#0b1020",
-  "theme_color": "#1a1a2e"
+  "theme_color": "#1a1a2e",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/icons/screenshot-narrow.png",
+      "sizes": "390x844",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Mind Sparks Trivia – Home Screen"
+    },
+    {
+      "src": "/icons/screenshot-wide.png",
+      "sizes": "1280x800",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Mind Sparks Trivia – Desktop View"
+    }
+  ]
 }
-
